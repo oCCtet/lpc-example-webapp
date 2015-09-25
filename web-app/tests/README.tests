@@ -1,0 +1,19 @@
+README.tests
+============
+
+The run-tests Bash script starts the server-under-test
+and the DeviceInfo API stub server, and runs various tests
+to ensure the server-under-test works properly. The tests
+mainly focus on the RESTful HTTP interface correctness.
+
+The run-tests is designed to be run via `npm test` command
+from the directory holding the `package.json` file. The tests
+use the config/devel.conf configuration, and work on the host.
+
+The tests require the following programs:
+
+ - bash
+ - curl
+ - jq
+
+Obviously, nodejs and npm are needed as well.

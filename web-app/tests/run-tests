@@ -1,0 +1,243 @@
+#!/bin/bash
+#
+# Test program, assumed to be run via 'npm test' from the
+# web-app base directory (where the package.json is located).
+#
+# (Bashism's used include the 'cmd <(cmd) <(cmd)' process
+# substitution.)
+
+#set -x
+
+#
+# Options.
+#
+hostname="localhost"
+port=8079
+
+# Include functions.
+. tests/functions
+
+#
+# The tests.
+#
+exec_test "JavaScript linting" make lint
+ensure_no_errors
+
+init_file tests/custom-properties.conf
+init_file tests/internal-join.conf
+spawn_jobs
+
+xfer_test  "/app.json" \
+           '/app.json' \
+           'public/app.json'
+
+xfer_test  "/example-app/index.json" \
+           '/example-app/index.json' \
+           'public/example-app/index.json'
+
+jsonp_test "/example-app/EXAMPLE" \
+           '/example-app/EXAMPLE?callback=test' \
+           'test' \
+           'public/example-app/EXAMPLE.jsonp'
+
+query_test "/monitor (os)" \
+           '/monitor' \
+           'jq -c ".os?|.[0]|keys"' \
+           '["arch","hostname","id","platform","release","type"]'
+
+query_test "/monitor (stats)" \
+           '/monitor' \
+           'jq -c ".stats?|keys"' \
+           '["freemem","id","loadavg","temperatures","totalmem"]'
+
+query_test "/monitor (cpu)" \
+           '/monitor' \
+           'jq -c ".cpu?|.[0]|keys"' \
+           '["id","model","speed","times"]'
+
+query_test "/monitor/stats (temperatures)" \
+           '/monitor/stats' \
+           'jq -c ".temperatures"' \
+           '[37.4,62.1]'
+
+json_test  "/mcaststat" \
+           '/mcaststat' \
+           'tests/mcastrecv.stat'
+
+start_file tests/custom-properties.conf
+  # initially no/empty file, response template entry
+  query_test "/properties: no content" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""}]'
+  nofile_test
+
+  # add first entry
+  post_test  "/properties: add item" \
+             '/properties' \
+             'jq -c .' \
+             '{"property_name":"t1","property_value":"v1"}' \
+             '{"id":0,"property_name":"t1","property_value":"v1","_type":"CustomProperty"}'
+  query_test "/properties: one entry" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":0,"property_name":"t1","property_value":"v1","_type":"CustomProperty"}]'
+  verify_f   '[{"id":0,"property_name":"t1","property_value":"v1"}]'
+
+  # add another entry
+  post_test  "/properties: add another item" \
+             '/properties' \
+             'jq -c .' \
+             '{"property_name":"t2","property_value":"v2"}' \
+             '{"id":1,"property_name":"t2","property_value":"v2","_type":"CustomProperty"}'
+  query_test "/properties: two entries" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":0,"property_name":"t1","property_value":"v1","_type":"CustomProperty"},{"id":1,"property_name":"t2","property_value":"v2","_type":"CustomProperty"}]'
+  verify_f   '[{"id":0,"property_name":"t1","property_value":"v1"},{"id":1,"property_name":"t2","property_value":"v2"}]'
+
+  # insert new entry
+  put_test   "/properties: insert new item" \
+             '/properties/7' \
+             'jq -c .' \
+             '{"property_name":"t3","property_value":"v3"}' \
+             '{"id":7,"property_name":"t3","property_value":"v3","_type":"CustomProperty"}'
+  query_test "/properties: three entries" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":0,"property_name":"t1","property_value":"v1","_type":"CustomProperty"},{"id":1,"property_name":"t2","property_value":"v2","_type":"CustomProperty"},{"id":7,"property_name":"t3","property_value":"v3","_type":"CustomProperty"}]'
+  verify_f   '[{"id":0,"property_name":"t1","property_value":"v1"},{"id":1,"property_name":"t2","property_value":"v2"},{"id":7,"property_name":"t3","property_value":"v3"}]'
+
+  # modify old entry
+  put_test   "/properties: modify item" \
+             '/properties/1' \
+             'jq -c .' \
+             '{"property_value":"v2.1"}' \
+             '{"id":1,"property_name":"t2","property_value":"v2.1","_type":"CustomProperty"}'
+  query_test "/properties: three entries, one modified" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":0,"property_name":"t1","property_value":"v1","_type":"CustomProperty"},{"id":1,"property_name":"t2","property_value":"v2.1","_type":"CustomProperty"},{"id":7,"property_name":"t3","property_value":"v3","_type":"CustomProperty"}]'
+  verify_f   '[{"id":0,"property_name":"t1","property_value":"v1"},{"id":1,"property_name":"t2","property_value":"v2.1"},{"id":7,"property_name":"t3","property_value":"v3"}]'
+
+  # replace the entire collection
+  put_test   "/properties: replace collection" \
+             '/properties' \
+             'jq -c .' \
+             '[{"id":10,"property_name":"t10","property_value":"v10"},{"id":11,"property_name":"t11","property_value":"v11"}]' \
+             '[{"id":10,"property_name":"t10","property_value":"v10","_type":"CustomProperty"},{"id":11,"property_name":"t11","property_value":"v11","_type":"CustomProperty"}]'
+  query_test "/properties: replaced collection with two entries" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":10,"property_name":"t10","property_value":"v10","_type":"CustomProperty"},{"id":11,"property_name":"t11","property_value":"v11","_type":"CustomProperty"}]'
+  verify_f   '[{"id":10,"property_name":"t10","property_value":"v10"},{"id":11,"property_name":"t11","property_value":"v11"}]'
+
+  # delete one entry
+  delete_test "/properties: one entry" '/properties/10'
+  query_test "/properties: deleted one entry" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""},{"id":11,"property_name":"t11","property_value":"v11","_type":"CustomProperty"}]'
+  verify_f   '[{"id":11,"property_name":"t11","property_value":"v11"}]'
+
+  # delete the entire collection
+  delete_test "/properties: entire collection" '/properties'
+
+  # after delete-all: no/empty file, response template entry
+  query_test "/properties: no content" \
+             '/properties' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""}]'
+  nofile_test
+end_file
+
+start_file tests/internal-join.conf
+  # initially no/empty file, response template entry
+  query_test "/internaljoin: no content" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000}]'
+  nofile_test
+
+  # add first entry
+  post_test  "/internaljoin: add item" \
+             '/internaljoin' \
+             'jq -c .' \
+             '{"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010}' \
+             '{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"}'
+  query_test "/internaljoin: one entry" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010}]'
+
+  # add another entry
+  post_test  "/internaljoin: add another item" \
+             '/internaljoin' \
+             'jq -c .' \
+             '{"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012}' \
+             '{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"}'
+  query_test "/internaljoin: two entries" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012}]'
+
+  # insert new entry
+  put_test   "/internaljoin: insert new item" \
+             '/internaljoin/7' \
+             'jq -c .' \
+             '{"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}' \
+             '{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}'
+  query_test "/internaljoin: three entries" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}]'
+
+  # modify old entry
+  put_test   "/internaljoin: modify item" \
+             '/internaljoin/1' \
+             'jq -c .' \
+             '{"addr":"234.1.2.2","vlan":4010}' \
+             '{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InternalJoin"}'
+  query_test "/internaljoin: three entries, one modified" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InternalJoin"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}]'
+
+  # replace the entire collection
+  put_test   "/internaljoin: replace collection" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]' \
+             '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InternalJoin"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
+  query_test "/internaljoin: replaced collection with two entries" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InternalJoin"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]'
+
+  # delete one entry
+  delete_test "/internaljoin: one entry" '/internaljoin/10'
+  query_test "/internaljoin: deleted one entry" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
+  verify_f   '[{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]'
+
+  # delete the entire collection
+  delete_test "/internaljoin: entire collection" '/internaljoin'
+
+  # after delete-all: no/empty file, response template entry
+  query_test "/internaljoin: no content" \
+             '/internaljoin' \
+             'jq -c .' \
+             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000}]'
+  nofile_test
+end_file
+
+kill_jobs
+report
+# EOF

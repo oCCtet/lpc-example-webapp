@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<list widths="22,28,22,28" type="property-table">
+    <row><col><text attr='name'/></col><col><field attr='name'/></col></row>
+    <rows attrs='addr,port,vlan' />
+</list>

@@ -1,0 +1,6 @@
+<?xml version="1.0" ?>
+<list widths="22,28,22,28" type="property-table">
+    <row><col><text attr='property_name'/></col><col><field attr='property_name'/></col></row>
+    <row><col><text attr='property_value'/></col><col><field attr='property_value'/></col></row>
+    <rows size='smaller' cols='2' attrs='persistent' />
+</list>

@@ -1,0 +1,73 @@
+/* global API, NS, _, moment */
+(function () {
+    //noinspection JSUnusedGlobalSymbols
+    return {
+        // EXAMPLE
+        construct: function (API) {
+            'use strict';
+            var NS = this;
+            NS.debugSettings = {
+                foreground: 'black',
+                background: 'lightBlue'
+            };
+            API.debug = API.debug && API.debug('construct.js for %s (=== %s)', this.namespace, NS.namespace);
+            _.delay(jQuery.proxy(function () {
+                API.trigger(API.CONSTRUCTED_EVENT_NAME, this.namespace);
+            }, this), 100);
+
+            NS.converters = {
+                FLOAT_LIST: {
+                    toUi: function (value) {
+                        var result = _.map(_.toArray(value), function (v) {
+                            return v.toFixed(2);
+                        });
+                        return result.join(", ");
+                    }
+                }
+            };
+
+            NS.model = {
+                McastReceiverStat: {
+                    getUrl: function () {
+                        var url;
+                        var addr = this.get('addr');
+                        var port = this.get('port');
+                        if (addr && port) {
+                            url = 'udp://' + addr + ':' + port;
+                        }
+                        return url;
+                    }
+                },
+                ExternalLink: {
+                    getUrl: function () {
+                        var port = window.location.port;
+                        if (port === "0" || port === "") {
+                            port = window.location.protocol === "https:" ? "443" : "80";
+                        }
+                        return API.getPath('/external_webui/index.html?host='
+                                           + window.location.hostname
+                                           + '&port=' + port);
+                    }
+                },
+                InputStreaming: {
+                    getUrl: function () {
+                        var url;
+                        var addr = this.get('addr');
+                        var port = this.get('port');
+                        if (addr && port) {
+                            url = 'udp://' + addr + ':' + port;
+                        }
+                        return url;
+                    }
+                },
+                ExtendedProperty: {
+                    getPersistentAccessibility: function () {
+                        return this.get('persistent') === true
+                            ? API.ATTRIBUTE_ACCESSIBILITY_STATUS.DISABLED
+                            : API.ATTRIBUTE_ACCESSIBILITY_STATUS.ENABLED;
+                    }
+                }
+            };
+        }
+    };
+}())

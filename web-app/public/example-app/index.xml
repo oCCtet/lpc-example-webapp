@@ -1,0 +1,207 @@
+<?xml version="1.0" ?>
+<engine v='1'>
+  <!--
+  xmlns="http://www.teleste.com"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.teleste.com index.xsd"
+  -->
+
+  <!--
+  Module monitoring opens by clicking the module face plate on the Monitor page;
+  it supports tabbed view, illustrated below: the first tab shows basic OS stats,
+  while the second tab shows example app statistics.
+  -->
+  <module_monitoring>
+    <edit icon='Monitor' heading=' Application module monitoring'>
+      <tab heading='OS information'>
+        <list widths='100%'>
+          <row><col>
+            <os_info model-meta='OsInfo' model-multiple='true' refreshable='false' widths='140px,140px,100%,140px'>
+              <header-row>
+                <col><text attr="hostname" /></col>
+                <col><text attr="type" /></col>
+                <col><text attr="release" /></col>
+                <col><text attr="arch" /></col>
+              </header-row>
+              <model-row>
+                <col><field readonly="true" attr="hostname" /></col>
+                <col><field readonly="true" attr="type" /></col>
+                <col><field readonly="true" attr="release" /></col>
+                <col><field readonly="true" attr="arch" /></col>
+              </model-row>
+            </os_info>
+          </col></row>
+          <row><col>
+            <os_stats model-meta='OsStats' model-multiple='true' refreshable='true' widths='140px,140px,200px,100%'>
+              <header-row>
+                <col><text attr="totalmem" /></col>
+                <col><text attr="freemem" /></col>
+                <col><text attr="loadavg" /></col>
+                <col><text attr="temperatures" /></col>
+              </header-row>
+              <model-row>
+                <col><field readonly="true" attr="totalmem" /></col>
+                <col><field readonly="true" attr="freemem" /></col>
+                <col><field readonly="true" attr="loadavg" /></col>
+                <col><field readonly="true" attr="temperatures" /></col>
+              </model-row>
+            </os_stats>
+          </col></row>
+          <row><col>
+            <cpu_info model-meta='CpuInfo' model-multiple='true' refreshable='true' widths='100%,140px'>
+              <header-row>
+                <col><text attr="model" /></col>
+                <col><text attr="speed" /></col>
+              </header-row>
+              <model-row>
+                <col><field readonly="true" attr="model" /></col>
+                <col><field readonly="true" attr="speed" /></col>
+              </model-row>
+            </cpu_info>
+          </col></row>
+        </list>
+      </tab>
+      <tab heading='Multicast receiving'>
+        <list widths='100%'>
+          <row><col>
+            <mcast_recv_stat model-meta='McastReceiverStat' model-multiple='true' refreshable='true' widths='140px,140px,200px,100%'>
+              <header-row>
+                <col><text attr="url" /></col>
+                <col><text attr="recvTime" /></col>
+                <col><text attr="recvBytes" /></col>
+                <col><text attr="recvPackets" /></col>
+              </header-row>
+              <model-row>
+                <col><field readonly="true" attr="url" /></col>
+                <col><field readonly="true" attr="recvTime" /></col>
+                <col><field readonly="true" attr="recvBytes" /></col>
+                <col><field readonly="true" attr="recvPackets" /></col>
+              </model-row>
+            </mcast_recv_stat>
+          </col></row>
+        </list>
+      </tab>
+    </edit>
+  </module_monitoring>
+
+  <!--
+  Module configuration opens by clicking the configuration icon of the Application
+  module on the Service page. Four locations are available: before_module_configuration,
+  module_configuration, after_module_configuration and advanced_module_configuration;
+  the advanced section is within an expander, which is initially closed.
+  -->
+  <before_module_configuration>
+    <external_ui_access model-meta='ExternalLink' model-id='any'>
+      <navigate-action href-attr='ext_url' text='OPEN EXAMPLE UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=ExternalUI,width=1024,height=788,x=10,y=10' />
+    </external_ui_access>
+  </before_module_configuration>
+
+  <module_configuration>
+    <block><!-- increase block level -->
+      <block icon='Network' heading='Input streaming'>
+        <input_mcast_streaming model-meta='InternalJoin' model-multiple='true' widths='100px,70%,30%,icon,icon'>
+          <col><field attr="name" readonly="true" /></col>
+          <col><field attr="url" readonly="true" /></col>
+          <col><field attr="vlan" readonly="true" /></col>
+          <col>
+            <edit-action>
+              <edit apply='true' icon='Configure' heading='Edit input'>
+                <include url='/example-app/edit-internal-join.xml' />
+              </edit>
+            </edit-action>
+          </col>
+          <col>
+            <delete-action text='Delete input'>
+              <delete buttons='delete-cancel' icon='Confirm' heading='Delete streaming input?'>
+                <confirm>
+                  <text>Do you want to delete input "</text><field readonly='true' attr='name' /><text>"?</text>
+                </confirm>
+              </delete>
+            </delete-action>
+          </col>
+        </input_mcast_streaming>
+        <add-action text='Add input'>
+          <edit model-meta='InternalJoin' model-create='true' icon='Configure' heading='Add streaming input'>
+            <include url='/example-app/edit-internal-join.xml' />
+          </edit>
+        </add-action>
+      </block>
+    </block>
+  </module_configuration>
+
+  <after_module_configuration>
+    <list widths='25,25,25,25' type='property-table'>
+      <row>
+        <col><text>Before configuration</text></col>
+        <col><text style="BOLD">Setting with some value</text></col>
+        <col><text>Before configuration</text></col>
+        <col><text style="BOLD">Setting with some value</text></col>
+      </row>
+    </list>
+  </after_module_configuration>
+
+  <advanced_module_configuration>
+    <list type='property-table'><row><col><text>Advanced</text></col></row></list>
+  </advanced_module_configuration>
+
+  <!--
+  Administration tiles support two locations: before_admin_tiles and
+  after_admin_tiles, the latter demonstrated below.
+  -->
+  <before_admin_tiles model-meta='AdminTile' model-multiple='true'>
+    <edit-action id='admin_tile' location-attr='location' options="{'tab-id': 'to_be_opened'}">
+      <heading attr="name" />
+      <text attr="description" />
+      <icon attr="icon" />
+    </edit-action>
+  </before_admin_tiles>
+
+  <after_admin_tiles model-meta='AdminTile' model-multiple='true'>
+    <edit-action id='admin_tile' location-attr='location' options="{'tab-id': 'to_be_opened'}">
+      <heading attr="name" />
+      <text attr="description" />
+      <icon attr="icon" />
+    </edit-action>
+  </after_admin_tiles>
+
+  <popup-container>
+    <user_defined_properties>
+      <block icon='Document2' heading='Custom properties'>
+        <custom_properties model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
+          <search-row></search-row>
+          <model-row>
+            <col><field attr="property_name" readonly="true" /></col>
+            <col><field attr="property_value" readonly="true" /></col>
+            <col>
+              <edit-action>
+                <edit apply='true' icon='Configure' heading='Edit property'>
+                  <include url='/example-app/edit-custom-property.xml' />
+                </edit>
+              </edit-action>
+            </col>
+            <col>
+              <delete-action>
+                <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
+                  <confirm>
+                    <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
+                  </confirm>
+                </delete>
+              </delete-action>
+            </col>
+          </model-row>
+        </custom_properties>
+        <add-action text='Add property'>
+          <edit model-meta='CustomProperty' model-create='true' icon='Configure' heading='Add property'>
+            <include url='/example-app/edit-custom-property.xml' />
+          </edit>
+        </add-action>
+      </block>
+    </user_defined_properties>
+
+    <open_custom_webui model-meta='ExternalLink' model-id='0'>
+      <navigate-action href-attr='ext_url' text='Custom UI (current window)' />
+      <navigate-action href-attr='ext_url' text='Custom UI (new vindow)' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,width=800,title=CustomUI,height=600,x=10,y=10' />
+      <container href-attr='ext_url' />
+    </open_custom_webui>
+  </popup-container>
+</engine>

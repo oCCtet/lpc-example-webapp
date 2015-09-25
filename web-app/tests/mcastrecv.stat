@@ -1,0 +1,18 @@
+[
+  {
+    "id": 0,
+    "addr": "234.4.5.6",
+    "port": 5100,
+    "recvTime": 1,
+    "recvBytes": 459756,
+    "recvPackets": 678
+  },
+  {
+    "id": 1,
+    "addr": "234.4.5.7",
+    "port": 5107,
+    "recvTime": 1,
+    "recvBytes": 59751,
+    "recvPackets": 65
+  }
+]

@@ -1,0 +1,32 @@
+{
+  "name": "web-app",
+  "version": "0.0.0",
+  "description": "Custom LPC web app",
+  "main": "index.js",
+  "scripts": {
+    "test": "./tests/run-tests",
+    "start": "nodejs index.js ./config/devel.conf"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://git.twin.net/users/sami.hartikainen/lpc-example-app.git"
+  },
+  "keywords": [
+    "lpc",
+    "web",
+    "webui",
+    "app"
+  ],
+  "author": "Sami Hartikainen <sami.hartikainen@teleste.com>",
+  "license": "Teleste Proprietary",
+  "dependencies": {
+    "express": "~4.13.3",
+    "q": "~1.4.1",
+    "lodash": "~3.10.1",
+    "body-parser": "~1.14.0"
+  },
+  "devDependencies": {
+    "jshint": "~2.8.0",
+    "make-jshint": "~1.0.0"
+  }
+}

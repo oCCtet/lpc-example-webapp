@@ -1,0 +1,284 @@
+# Test helper functions.        -*- shell-script -*-
+
+#
+# Global variables.
+#
+test_nbr=0
+test_err=0
+spawn_result=0
+stub_pid=0
+app_pid=0
+filename=""
+
+#
+# Test helper functions.
+#
+spawn_app()
+{
+    echo -n "Spawning $@ ... "
+    $@ &
+    spawn_result=$!
+    echo "done (pid $spawn_result)"
+}
+
+kill_app()
+{
+    if [ $1 -ne 0 ]; then
+	echo "Killing pid $1 ... "
+	kill -TERM $1 && return 0 || return $1
+    else
+	echo "Pid is zero, not killing."
+	return $1
+    fi
+}
+
+spawn_jobs()
+{
+    spawn_app nodejs tests/deviceinfo_stub.js
+    stub_pid=$spawn_result
+    spawn_app nodejs index.js config/devel.conf
+    app_pid=$spawn_result
+    sleep 2
+}
+
+kill_jobs()
+{
+    kill_app $app_pid
+    kill_app $stub_pid
+}
+
+report()
+{
+    if [ $test_err -gt 0 ]; then
+	echo "$test_err of $test_nbr tests FAILED."
+	exit 1
+    else
+	echo "All $test_nbr test(s) PASSED."
+    fi
+}
+
+ensure_no_errors()
+{
+    if [ $test_err -gt 0 ]; then
+	echo "Test(s) FAILED, refusing to continue."
+	exit 1
+    fi
+}
+
+exec_test()
+{
+    local msg="$1"
+    local result=1
+    shift
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: $msg ... "
+
+    $@
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+query_test()
+{
+    local msg="$1"
+    local url="$2"
+    local filter="$3"
+    local expect="$4"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: GET $msg ... "
+
+    local result=$(curl -s http://${hostname}:${port}${url} | eval $filter)
+
+    if [ "$result" = "$expect" ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+put_test()
+{
+    local msg="$1"
+    local url="$2"
+    local filter="$3"
+    local data="$4"
+    local expect="$5"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: PUT $msg ... "
+
+    local result=$(curl -s -X PUT -H 'Content-Type: application/json' http://${hostname}:${port}${url} --data "$data" | eval $filter)
+
+    if [ "$result" = "$expect" ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+post_test()
+{
+    local msg="$1"
+    local url="$2"
+    local filter="$3"
+    local data="$4"
+    local expect="$5"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: POST $msg ... "
+
+    local result=$(curl -s -X POST -H 'Content-Type: application/json' http://${hostname}:${port}${url} --data "$data" | eval $filter)
+
+    if [ "$result" = "$expect" ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+delete_test()
+{
+    local msg="$1"
+    local url="$2"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: DELETE $msg ... "
+
+    curl -s -X DELETE http://${hostname}:${port}${url}
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+xfer_test()
+{
+    local msg="$1"
+    local url="$2"
+    local path="$3"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: XFER $msg ... "
+
+    curl -s http://${hostname}:${port}${url} | diff -u $path -
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+json_test()
+{
+    local msg="$1"
+    local url="$2"
+    local path="$3"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: JSON $msg ... "
+
+    diff -q <(curl -s http://${hostname}:${port}${url} | jq .) <(cat $path | jq .)
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+jsonp_test()
+{
+    local msg="$1"
+    local url="$2"
+    local fun="$3"
+    local path="$4"
+
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: JSONP $msg ... "
+
+    diff -q <(curl -s http://${hostname}:${port}${url}) \
+            <(echo -n "/**/ typeof $fun === 'function' && ${fun}(" \
+              && cat $path && echo -n ");")
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+init_file()
+{
+    [ -n "$1" ] || { echo "FATAL: Missing file name."; exit 2; }
+    [ -f "$1" ] && mv "$1" "${1}.test-bak"
+}
+
+start_file()
+{
+    filename="$1"
+    [ -n "$filename" ] || { echo "FATAL: Missing file name."; exit 2; }
+}
+
+verify_f()
+{
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: verify ($filename) ... "
+
+    diff -q <(echo -n "$1") <(cat "$filename")
+    result=$?
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}
+
+end_file()
+{
+    [ -f "${filename}.test-bak" ] && mv "${filename}.test-bak" "$filename"
+    filename=""
+}
+
+nofile_test()
+{
+    test_nbr=$((test_nbr + 1))
+    echo -n "${test_nbr}: nofile ($filename) ... "
+
+    if [ -f "$filename" ]; then
+	diff -q <(cat "$filename") <(echo -n "[]")
+	result=$?
+    else
+        result=0
+    fi
+
+    if [ $result -eq 0 ]; then
+        echo "PASS"
+    else
+        test_err=$((test_err + 1))
+        echo "FAIL"
+    fi
+}

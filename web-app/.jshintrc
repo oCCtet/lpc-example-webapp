@@ -1,0 +1,11 @@
+{
+  "futurehostile": true,
+  "latedef": true,
+  "nocomma": true,
+  "node": true,
+  "nonbsp": true,
+  "nonew": true,
+  "singleGroups": true,
+  "undef": true,
+  "unused": true
+}

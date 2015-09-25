@@ -1,0 +1,116 @@
+{
+  "namespace": "EXAMPLE",
+  "ctor": "/example-app/EXAMPLE",
+  "version": "1",
+  "host-references": {
+    "enum-meta": {
+      "HostVlans": "EngineVlan"
+    }
+  },
+  "model-meta": [
+    {
+      "id": "OsInfo",
+      "url": "/monitor/os",
+      "attributes": [
+        {"name": "hostname", "label": "Hostname",         "type": "STRING"},
+        {"name": "type",     "label": "Operating system", "type": "STRING"},
+        {"name": "release",  "label": "Kernel release",   "type": "STRING"},
+        {"name": "arch",     "label": "Architecture",     "type": "STRING"}
+      ]
+    },
+    {
+      "id": "OsStats",
+      "url": "/monitor/stats",
+      "refetchInterval": "5s",
+      "attributes": [
+        {"name": "totalmem",     "label": "Total memory",           "type": "STRING"},
+        {"name": "freemem",      "label": "Free memory",            "type": "STRING"},
+        {"name": "loadavg",      "label": "Load averages",          "type": "CUSTOM_NUMBER", "converter": "FLOAT_LIST"},
+        {"name": "temperatures", "label": "Temperatures (&#8451;)", "type": "CUSTOM_NUMBER", "converter": "FLOAT_LIST"}
+      ]
+    },
+    {
+      "id": "CpuInfo",
+      "url": "/monitor/cpu",
+      "refetchInterval": "5s",
+      "attributes": [
+        {"name": "model", "label": "Processor model", "type": "STRING"},
+        {"name": "speed", "label": "Speed (MHz)",     "type": "STRING"}
+      ]
+    },
+    {
+      "id": "McastReceiverStat",
+      "url": "/mcaststat",
+      "refetchInterval": "5s",
+      "attributes": [
+        {"name": "addr",                                      "type": "STRING"},
+        {"name": "port",                                      "type": "STRING"},
+        {"name": "url",         "label": "Address",           "type": "STRING", "uses": ["addr", "port"], "getFn": "getUrl"},
+        {"name": "recvTime",    "label": "Monitoring time",   "type": "STRING"},
+        {"name": "recvBytes",   "label": "Bytes received",    "type": "STRING"},
+        {"name": "recvPackets", "label": "Packets received",  "type": "STRING"}
+      ]
+    },
+    {
+      "id": "ExternalLink",
+      "url": "N/A",
+      "local": true,
+      "attributes": [
+        {"name": "ext_url", "getFn": "getUrl"}
+      ],
+      "models": [
+        {"id": "0", "unique_id": "0"}
+      ]
+    },
+    {
+      "id": "InternalJoin",
+      "url": "/internaljoin",
+      "readonlyAttribute": "readonly",
+      "persistentAttribute": "persistent",
+      "attributes": [
+        {"name": "readonly",                           "rw": "r",  "type": "BOOLEAN"},
+        {"name": "persistent",                         "rw": "r",  "type": "BOOLEAN"},
+        {"name": "name", "label": "Name",              "rw": "rw", "type": "STRING", "min": 1},
+        {"name": "url",  "label": "Address",           "rw": "r",  "type": "STRING", "uses": ["addr", "port", "vlan"], "getFn": "getUrl"},
+        {"name": "addr", "label": "IP address",        "rw": "rw", "type": "MULTICAST_IP"},
+        {"name": "port",                               "rw": "rw", "type": "INTEGER", "min": 1, "max": 65535},
+        {"name": "vlan", "label": "Payload interface", "rw": "rw", "type": "INTEGER", "enumeration": "HostVlans"}
+      ],
+      "dataConsistencyRules": {
+        "uniqueAddress": {
+          "type": "UNIQUE",
+          "attributes": ["addr", "port", "vlan"]
+        }
+      }
+    },
+    {
+      "id": "CustomProperty",
+      "url": "/properties",
+      "readonlyAttribute": "readonly",
+      "persistentAttribute": "persistent",
+      "attributes": [
+        {"name": "readonly",                                           "rw": "r",  "type": "BOOLEAN"},
+        {"name": "persistent",                                         "rw": "rw", "type": "BOOLEAN"},
+        {"name": "persistent_accessibility",                                       "type": "ACCESSIBILITY", "getFn": "getPersistentAccessibility", "uses": ["persistent"]},
+        {"name": "property_name",            "label": "Property name", "rw": "rw", "type": "STRING", "min": 1, "accessibility": "persistent_accessibility"},
+        {"name": "property_value",           "label": "Value",         "rw": "rw", "type": "STRING", "min": 1}
+      ]
+    },
+    {
+      "id": "AdminTile",
+      "url": "N/A",
+      "canDrag": true,
+      "attributes": [
+        {"name": "name",        "rw": "rw", "label": "Name"},
+        {"name": "description", "rw": "rw", "label": "Description"},
+        {"name": "location",    "rw": "rw", "label": "Link"},
+        {"name": "icon",        "type": "ICON", "defaultValue": "LOG_SETTINGS"},
+        {"name": "edit_title",  "label": "",    "defaultValue": "Edit AdminTile"}
+      ],
+      "models": [
+        {"id": "1", "unique_id": "1", "name": "Custom properties", "description": "Manage user-defined properties of the application module.", "location": "custom_properties"},
+        {"id": "2", "unique_id": "2", "name": "Custom UI", "description": "Open stand-alone custom web UI.", "location": "open_custom_webui"}
+      ]
+    }
+  ]
+}
