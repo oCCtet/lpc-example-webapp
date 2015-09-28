@@ -34,15 +34,29 @@ function readInternaljoinConfig (obj) {
 }
 
 function applyConfig (obj) {
-    return Q.fcall(function () {
+    var defer = Q.defer();
+    var added = 0;
+
+    ijoin.clear(function (err) {  // jshint ignore: line
+	// ignore any clearing error
+	if (_.isEmpty(obj.config)) {
+	    defer.resolve(obj);
+	    return;
+	}
 	_.forEach(obj.config, function (value) {
 	    ijoin.add(value, function (err) {
-		if (err)
-		    console.error("Failed to add: " + err.message);
+		if (err) {
+		    defer.reject(new Error("Failed to add: " + err.message));
+		    return;
+		}
+		if (++added === obj.config.length) {
+		    defer.resolve(obj);
+		}
 	    });
 	});
-	return obj;
     });
+
+    return defer.promise;
 }
 
 function writeInternaljoinConfig (config) {
@@ -112,7 +126,10 @@ function replace (config, input) {
     ijoin.clear(function (err) {  // jshint ignore: line
 	// ignore any clearing error
 	config.splice(0, config.length);
-
+	if (_.isEmpty(data)) {
+	    defer.resolve(config);
+	    return;
+	}
 	_.forEach(data, function (value) {
 	    ijoin.add(value, function (err) {
 		if (err) {
