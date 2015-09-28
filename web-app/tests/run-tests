@@ -64,6 +64,8 @@ json_test  "/mcaststat" \
            '/mcaststat' \
            'tests/mcastrecv.stat'
 
+ensure_no_errors
+
 start_file tests/custom-properties.conf
   # initially no/empty file, response template entry
   query_test "/properties: no content" \
@@ -150,6 +152,8 @@ start_file tests/custom-properties.conf
              '[{"_template":true,"_type":"CustomProperty","property_name":"","property_value":""}]'
   nofile_test
 end_file
+
+ensure_no_errors
 
 start_file tests/internal-join.conf
   # initially no/empty file, response template entry

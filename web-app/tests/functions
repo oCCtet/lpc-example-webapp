@@ -15,10 +15,19 @@ filename=""
 #
 spawn_app()
 {
+    local before=0
+    local after=0
+
     echo -n "Spawning $@ ... "
+    before=$(jobs -p | wc -l)
     $@ &
-    spawn_result=$!
-    echo "done (pid $spawn_result)"
+    after=$(jobs -p | wc -l)
+    if [ $before -lt $after ]; then
+	spawn_result=$!
+	echo "done (pid $spawn_result)"
+    else
+	echo "FAILED (no jobs spawned)"
+    fi
 }
 
 kill_app()
@@ -27,7 +36,6 @@ kill_app()
 	echo "Killing pid $1 ... "
 	kill -TERM $1 && return 0 || return $1
     else
-	echo "Pid is zero, not killing."
 	return $1
     fi
 }
@@ -36,6 +44,7 @@ spawn_jobs()
 {
     spawn_app nodejs tests/deviceinfo_stub.js
     stub_pid=$spawn_result
+    sleep 1
     spawn_app nodejs index.js config/devel.conf
     app_pid=$spawn_result
     sleep 2
@@ -60,6 +69,7 @@ report()
 ensure_no_errors()
 {
     if [ $test_err -gt 0 ]; then
+	kill_jobs
 	echo "Test(s) FAILED, refusing to continue."
 	exit 1
     fi
@@ -151,6 +161,7 @@ delete_test()
 {
     local msg="$1"
     local url="$2"
+    local result=1
 
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: DELETE $msg ... "
@@ -171,6 +182,7 @@ xfer_test()
     local msg="$1"
     local url="$2"
     local path="$3"
+    local result=1
 
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: XFER $msg ... "
@@ -191,6 +203,7 @@ json_test()
     local msg="$1"
     local url="$2"
     local path="$3"
+    local result=1
 
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: JSON $msg ... "
@@ -212,6 +225,7 @@ jsonp_test()
     local url="$2"
     local fun="$3"
     local path="$4"
+    local result=1
 
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: JSONP $msg ... "
@@ -243,6 +257,8 @@ start_file()
 
 verify_f()
 {
+    local result=1
+
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: verify ($filename) ... "
 
@@ -265,14 +281,14 @@ end_file()
 
 nofile_test()
 {
+    local result=0
+
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: nofile ($filename) ... "
 
     if [ -f "$filename" ]; then
 	diff -q <(cat "$filename") <(echo -n "[]")
 	result=$?
-    else
-        result=0
     fi
 
     if [ $result -eq 0 ]; then
