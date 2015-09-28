@@ -27,10 +27,10 @@ module.exports = function (lpcApiAddress) {
 	    });
 	},
 	delete: function(item, cb) {
-	    // The '99999' is a special id meaning that the query string parameters
+	    // The 'byquery' is a special id meaning that the query string parameters
 	    // should be used instead to deduce what item to remove.
 	    var opts = _.merge({}, this.options, {
-		path: "/input/streaming/99999?addr=" + item.addr + "&vlan=" + item.vlan,
+		path: "/input/streaming/byquery?addr=" + item.addr + "&vlan=" + item.vlan,
 		method: "DELETE"
 	    });
 	    httpRequest(opts, function (err, res) {
