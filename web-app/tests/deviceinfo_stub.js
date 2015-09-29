@@ -33,7 +33,7 @@ app.get("/sensors/temperature", function (req, res) {
     }
 });
 
-app.post("/input/streaming", function (req, res) {
+app.post("/internaljoin", function (req, res) {
     if (reportError === true) {
 	res.status(500).json({ id: -1, error: "Internal error", details: "reportError === true" });
     } else {
@@ -47,7 +47,7 @@ app.post("/input/streaming", function (req, res) {
     }
 });
 
-app.delete("/input/streaming", function (req, res) {
+app.delete("/internaljoin", function (req, res) {
     if (reportError === true) {
 	res.status(500).json({ id: -1, error: "Internal error", details: "reportError === true" });
     } else {
@@ -55,7 +55,7 @@ app.delete("/input/streaming", function (req, res) {
     }
 });
 
-app.delete("/input/streaming/:id", function (req, res) {
+app.delete("/internaljoin/:id", function (req, res) {
     if (reportError === true) {
 	res.status(500).json({ id: -1, error: "Internal error", details: "reportError === true" });
     } else if (req.params.id !== "byquery") {

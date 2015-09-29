@@ -99,14 +99,14 @@
   <module_configuration>
     <block><!-- increase block level -->
       <block icon='Network' heading='Input streaming'>
-        <input_mcast_streaming model-meta='InternalJoin' model-multiple='true' widths='100px,70%,30%,icon,icon'>
+        <input_mcast_streaming model-meta='InputStreaming' model-multiple='true' widths='100px,70%,30%,icon,icon'>
           <col><field attr="name" readonly="true" /></col>
           <col><field attr="url" readonly="true" /></col>
           <col><field attr="vlan" readonly="true" /></col>
           <col>
             <edit-action>
               <edit apply='true' icon='Configure' heading='Edit input'>
-                <include url='/example-app/edit-internal-join.xml' />
+                <include url='/example-app/edit-input-streaming.xml' />
               </edit>
             </edit-action>
           </col>
@@ -121,8 +121,8 @@
           </col>
         </input_mcast_streaming>
         <add-action text='Add input'>
-          <edit model-meta='InternalJoin' model-create='true' icon='Configure' heading='Add streaming input'>
-            <include url='/example-app/edit-internal-join.xml' />
+          <edit model-meta='InputStreaming' model-create='true' icon='Configure' heading='Add streaming input'>
+            <include url='/example-app/edit-input-streaming.xml' />
           </edit>
         </add-action>
       </block>

@@ -1,8 +1,8 @@
-// Routes for "internal join".
+// Routes for input streaming.
 //
 // The internal switch of the Luminato chassis does not support IGMP
 // snooping, meaning that in order to receive multicast packets, manual
-// or application-controlled internal join must be performed.
+// or application-controlled "internal join" must be performed.
 //
 // This example route supports manual internal join, with add/remove
 // interface on the WebUI.
@@ -31,13 +31,13 @@ router.param("id", function (req, res, next, id) {
 
 router.all(function (req, res, next) {
     if (!req.accepts("application/json"))
-	return res.status(406).send("ERROR: Must accept application/json");
+	return res.status(406).send("Must accept application/json");
     next();
 });
 
 router.route("/")
     .get(function (req, res) {
-	app.internaljoin.list()
+	app.inputstreaming.list()
 	    .then(function (data) {
 		res.json(data);
 	    })
@@ -47,7 +47,7 @@ router.route("/")
 	    .done();
     })
     .put(function (req, res) {
-	app.internaljoin.replace(req.body)
+	app.inputstreaming.replace(req.body)
 	    .then(function (data) {
 		res.json(data);
 	    })
@@ -57,7 +57,7 @@ router.route("/")
 	    .done();
     })
     .post(function (req, res) {
-	app.internaljoin.create(req.body)
+	app.inputstreaming.create(req.body)
 	    .then(function (data) {
 		res.json(data);
 	    })
@@ -67,7 +67,7 @@ router.route("/")
 	    .done();
     })
     .delete(function (req, res) {
-	app.internaljoin.clear()
+	app.inputstreaming.clear()
 	    .then(function () {
 		res.end();
 	    })
@@ -79,7 +79,7 @@ router.route("/")
 
 router.route("/:id")
     .get(function (req, res) {
-	app.internaljoin.retrieve(req.id)
+	app.inputstreaming.retrieve(req.id)
 	    .then(function (data) {
 		res.json(data);
 	    })
@@ -89,7 +89,7 @@ router.route("/:id")
 	    .done();
     })
     .put(function (req, res) {
-	app.internaljoin.update(req.id, req.body)
+	app.inputstreaming.update(req.id, req.body)
 	    .then(function (data) {
 		res.json(data);
 	    })
@@ -99,7 +99,7 @@ router.route("/:id")
 	    .done();
     })
     .delete(function (req, res) {
-	app.internaljoin.erase(req.id)
+	app.inputstreaming.erase(req.id)
 	    .then(function () {
 		res.end();
 	    })

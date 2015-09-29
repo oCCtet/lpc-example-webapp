@@ -1,6 +1,6 @@
-// Internal join library functions.
+// Input streaming library functions.
 //
-// Configures Luminato chassis switch using the /input/streaming
+// Configures Luminato chassis switch using the /internaljoin
 // API provided by the LPC module's DeviceInfo agent.
 //
 // Copyright (C) 2015 Teleste Corporation
@@ -11,11 +11,11 @@ var httpRequest = require("./httprequest");
 var _ = require("lodash");
 
 module.exports = function (lpcApiAddress) {
-    var internaljoin = {
+    var inputstreaming = {
 	options: {
 	    hostname: lpcApiAddress.addr,
 	    port: lpcApiAddress.port,
-	    path: "/input/streaming"
+	    path: "/internaljoin"
 	},
 	add: function(item, cb) {
 	    var opts = _.merge({}, this.options, { method: "POST" });
@@ -30,7 +30,7 @@ module.exports = function (lpcApiAddress) {
 	    // The 'byquery' is a special id meaning that the query string parameters
 	    // should be used instead to deduce what item to remove.
 	    var opts = _.merge({}, this.options, {
-		path: "/input/streaming/byquery?addr=" + item.addr + "&vlan=" + item.vlan,
+		path: "/internaljoin/byquery?addr=" + item.addr + "&vlan=" + item.vlan,
 		method: "DELETE"
 	    });
 	    httpRequest(opts, function (err, res) {
@@ -51,5 +51,5 @@ module.exports = function (lpcApiAddress) {
 	}
     };
 
-    return internaljoin;
+    return inputstreaming;
 };

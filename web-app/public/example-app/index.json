@@ -63,8 +63,8 @@
       ]
     },
     {
-      "id": "InternalJoin",
-      "url": "/internaljoin",
+      "id": "InputStreaming",
+      "url": "/inputstreaming",
       "readonlyAttribute": "readonly",
       "persistentAttribute": "persistent",
       "attributes": [

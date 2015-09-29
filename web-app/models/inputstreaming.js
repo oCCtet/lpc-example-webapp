@@ -1,4 +1,4 @@
-// Internal join data model maintains a JSON-format configuration
+// Input streaming data model maintains a JSON-format configuration
 // file and calls the library functions to configure the switch.
 //
 // Copyright (C) 2015 Teleste Corporation
@@ -7,15 +7,15 @@
 
 "use strict";
 
-var ij = require("../lib/internaljoin");
+var is = require("../lib/inputstreaming");
 var fs = require("fs");
 var Q = require("q");
 var _ = require("lodash");
 
-var filename = "internal-join.conf";
-var ijoin;
+var filename = "input-streaming.conf";
+var istream;
 
-function readInternaljoinConfig (obj) {
+function readInputStreamingConfig (obj) {
     var defer = Q.defer();
     var configPath = app.config.persistentConfigDir + filename;
 
@@ -27,7 +27,7 @@ function readInternaljoinConfig (obj) {
 	    defer.resolve(obj);
 	});
     } catch (e) {
-	defer.reject(new Error("Failed to read internaljoin: " + e.message));
+	defer.reject(new Error("Failed to read: " + e.message));
     }
 
     return defer.promise;
@@ -37,14 +37,14 @@ function applyConfig (obj) {
     var defer = Q.defer();
     var added = 0;
 
-    ijoin.clear(function (err) {  // jshint ignore: line
+    istream.clear(function (err) {  // jshint ignore: line
 	// ignore any clearing error
 	if (_.isEmpty(obj.config)) {
 	    defer.resolve(obj);
 	    return;
 	}
 	_.forEach(obj.config, function (value) {
-	    ijoin.add(value, function (err) {
+	    istream.add(value, function (err) {
 		if (err) {
 		    defer.reject(new Error("Failed to add: " + err.message));
 		    return;
@@ -59,7 +59,7 @@ function applyConfig (obj) {
     return defer.promise;
 }
 
-function writeInternaljoinConfig (config) {
+function writeInputStreamingConfig (config) {
     var defer = Q.defer();
     var configPath = app.config.persistentConfigDir + filename;
 
@@ -72,7 +72,7 @@ function writeInternaljoinConfig (config) {
 	    }
 	});
     } catch (e) {
-	defer.reject(new Error("Failed to write internaljoin: " + e.message));
+	defer.reject(new Error("Failed to write: " + e.message));
     }
 
     return defer.promise;
@@ -82,7 +82,7 @@ function injectTemplate (config) {
     return Q.fcall(function () {
 	return [{
 	    _template: true,
-	    _type: "InternalJoin",
+	    _type: "InputStreaming",
 	    name: "",
 	    addr: "",
 	    port: 0,
@@ -94,7 +94,7 @@ function injectTemplate (config) {
 function injectType (config) {
     return Q.fcall(function () {
 	return _.map(config, function (item) {
-	    return _.merge({}, item, { _type: "InternalJoin" });
+	    return _.merge({}, item, { _type: "InputStreaming" });
 	});
     });
 }
@@ -123,7 +123,7 @@ function replace (config, input) {
     var data = _.isArray(input) ? input : [ input ];
     var added = 0;
 
-    ijoin.clear(function (err) {  // jshint ignore: line
+    istream.clear(function (err) {  // jshint ignore: line
 	// ignore any clearing error
 	config.splice(0, config.length);
 	if (_.isEmpty(data)) {
@@ -131,7 +131,7 @@ function replace (config, input) {
 	    return;
 	}
 	_.forEach(data, function (value) {
-	    ijoin.add(value, function (err) {
+	    istream.add(value, function (err) {
 		if (err) {
 		    defer.reject(new Error("Failed to add: " + err.message));
 		    return;
@@ -156,7 +156,7 @@ function allocateNewEntry (config, input) {
 	}, 0)
 	.value();
 
-    ijoin.add(input, function (err) {
+    istream.add(input, function (err) {
 	if (err) {
 	    defer.reject(new Error("Failed to add: " + err.message));
 	} else {
@@ -173,7 +173,7 @@ function updateOrCreate (config, id, input) {
     var item = _.findWhere(config, { "id": id });
 
     if (item === undefined) {
-	ijoin.add(input, function (err) {
+	istream.add(input, function (err) {
 	    if (err) {
 		defer.reject(new Error("Failed to add: " + err.message));
 	    } else {
@@ -182,10 +182,10 @@ function updateOrCreate (config, id, input) {
 	    }
 	});
     } else {
-	ijoin.delete(item, function (err) {  // jshint ignore: line
+	istream.delete(item, function (err) {  // jshint ignore: line
 	    // ignore any deletion error
 	    var newItem = _.merge({}, item, input);
-	    ijoin.add(newItem, function (err) {
+	    istream.add(newItem, function (err) {
 		if (err) {
 		    defer.reject(new Error("Failed to update: " + err.message));
 		} else {
@@ -202,7 +202,7 @@ function updateOrCreate (config, id, input) {
 function clear (config) {
     var defer = Q.defer();
 
-    ijoin.clear(function (err) {
+    istream.clear(function (err) {
 	if (err) {
 	    defer.reject(new Error("Failed to clear: " + err.message));
 	} else {
@@ -219,7 +219,7 @@ function erase (config, id) {
     var item = _.findWhere(config, { "id": id });
 
     if (item !== undefined) {
-	ijoin.delete(item, function (err) {
+	istream.delete(item, function (err) {
 	    if (err) {
 		defer.reject(new Error("Failed to delete: " + err.message));
 	    } else {
@@ -235,7 +235,7 @@ function erase (config, id) {
 }
 
 module.exports = function () {
-    var internaljoin = {
+    var inputstreaming = {
 	config: [],
 	list: function () {
 	    return injectType(this.config)
@@ -248,13 +248,13 @@ module.exports = function () {
 	},
 	replace: function (input) {
 	    return replace(this.config, input)
-		.then(writeInternaljoinConfig)
+		.then(writeInputStreamingConfig)
 		.then(injectType);
 	},
 	create: function (input) {
 	    return allocateNewEntry(this.config, input)
 		.then(function (obj) {
-		    return writeInternaljoinConfig(obj.coll)
+		    return writeInputStreamingConfig(obj.coll)
 			.then(function (coll) {
 			    return findById(coll, obj.id);
 			});
@@ -264,7 +264,7 @@ module.exports = function () {
 	},
 	update: function (id, input) {
 	    return updateOrCreate(this.config, id, input)
-		.then(writeInternaljoinConfig)
+		.then(writeInputStreamingConfig)
 		.then(function (data) {
 		    return findById(data, id);
 		})
@@ -273,16 +273,16 @@ module.exports = function () {
 	},
 	clear: function () {
 	    return clear(this.config)
-		.then(writeInternaljoinConfig);
+		.then(writeInputStreamingConfig);
 	},
 	erase: function (id) {
 	    return erase(this.config, id)
-		.then(writeInternaljoinConfig);
+		.then(writeInputStreamingConfig);
 	}
     };
 
-    ijoin = ij(app.config.lpcApiAddress);
+    istream = is(app.config.lpcApiAddress);
 
-    return readInternaljoinConfig(internaljoin)
+    return readInputStreamingConfig(inputstreaming)
 	.then(applyConfig);
 };

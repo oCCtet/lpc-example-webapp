@@ -24,7 +24,7 @@ exec_test "JavaScript linting" make lint
 ensure_no_errors
 
 init_file tests/custom-properties.conf
-init_file tests/internal-join.conf
+init_file tests/input-streaming.conf
 spawn_jobs
 
 xfer_test  "/app.json" \
@@ -67,7 +67,7 @@ json_test  "/mcaststat" \
 ensure_no_errors
 
 start_file tests/custom-properties.conf
-  # initially no/empty file, response template entry
+  # initially no/empty file, response shall be template entry
   query_test "/properties: no content" \
              '/properties' \
              'jq -c .' \
@@ -155,90 +155,90 @@ end_file
 
 ensure_no_errors
 
-start_file tests/internal-join.conf
-  # initially no/empty file, response template entry
-  query_test "/internaljoin: no content" \
-             '/internaljoin' \
+start_file tests/input-streaming.conf
+  # initially no/empty file, response shall be template entry
+  query_test "/inputstreaming: no content" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000}]'
   nofile_test
 
   # add first entry
-  post_test  "/internaljoin: add item" \
-             '/internaljoin' \
+  post_test  "/inputstreaming: add item" \
+             '/inputstreaming' \
              'jq -c .' \
              '{"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010}' \
-             '{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"}'
-  query_test "/internaljoin: one entry" \
-             '/internaljoin' \
+             '{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InputStreaming"}'
+  query_test "/inputstreaming: one entry" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InputStreaming"}]'
   verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010}]'
 
   # add another entry
-  post_test  "/internaljoin: add another item" \
-             '/internaljoin' \
+  post_test  "/inputstreaming: add another item" \
+             '/inputstreaming' \
              'jq -c .' \
              '{"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012}' \
-             '{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"}'
-  query_test "/internaljoin: two entries" \
-             '/internaljoin' \
+             '{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InputStreaming"}'
+  query_test "/inputstreaming: two entries" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InputStreaming"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InputStreaming"}]'
   verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012}]'
 
   # insert new entry
-  put_test   "/internaljoin: insert new item" \
-             '/internaljoin/7' \
+  put_test   "/inputstreaming: insert new item" \
+             '/inputstreaming/7' \
              'jq -c .' \
              '{"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}' \
-             '{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}'
-  query_test "/internaljoin: three entries" \
-             '/internaljoin' \
+             '{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InputStreaming"}'
+  query_test "/inputstreaming: three entries" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InternalJoin"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InputStreaming"},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012,"_type":"InputStreaming"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InputStreaming"}]'
   verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.1.2","port":5602,"vlan":4012},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}]'
 
   # modify old entry
-  put_test   "/internaljoin: modify item" \
-             '/internaljoin/1' \
+  put_test   "/inputstreaming: modify item" \
+             '/inputstreaming/1' \
              'jq -c .' \
              '{"addr":"234.1.2.2","vlan":4010}' \
-             '{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InternalJoin"}'
-  query_test "/internaljoin: three entries, one modified" \
-             '/internaljoin' \
+             '{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InputStreaming"}'
+  query_test "/inputstreaming: three entries, one modified" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InternalJoin"},{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InternalJoin"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010,"_type":"InputStreaming"},{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010,"_type":"InputStreaming"},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012,"_type":"InputStreaming"}]'
   verify_f   '[{"id":0,"name":"t1","addr":"234.1.1.1","port":5600,"vlan":4010},{"id":1,"name":"t2","addr":"234.1.2.2","port":5602,"vlan":4010},{"id":7,"name":"t3","addr":"234.1.2.3","port":5603,"vlan":4012}]'
 
   # replace the entire collection
-  put_test   "/internaljoin: replace collection" \
-             '/internaljoin' \
+  put_test   "/inputstreaming: replace collection" \
+             '/inputstreaming' \
              'jq -c .' \
              '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]' \
-             '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InternalJoin"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
-  query_test "/internaljoin: replaced collection with two entries" \
-             '/internaljoin' \
+             '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InputStreaming"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InputStreaming"}]'
+  query_test "/inputstreaming: replaced collection with two entries" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InternalJoin"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010,"_type":"InputStreaming"},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InputStreaming"}]'
   verify_f   '[{"id":10,"name":"t10","addr":"224.1.1.1","port":5100,"vlan":4010},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]'
 
   # delete one entry
-  delete_test "/internaljoin: one entry" '/internaljoin/10'
-  query_test "/internaljoin: deleted one entry" \
-             '/internaljoin' \
+  delete_test "/inputstreaming: one entry" '/inputstreaming/10'
+  query_test "/inputstreaming: deleted one entry" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InternalJoin"}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000},{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012,"_type":"InputStreaming"}]'
   verify_f   '[{"id":11,"name":"t20","addr":"224.1.1.2","port":5101,"vlan":4012}]'
 
   # delete the entire collection
-  delete_test "/internaljoin: entire collection" '/internaljoin'
+  delete_test "/inputstreaming: entire collection" '/inputstreaming'
 
   # after delete-all: no/empty file, response template entry
-  query_test "/internaljoin: no content" \
-             '/internaljoin' \
+  query_test "/inputstreaming: no content" \
+             '/inputstreaming' \
              'jq -c .' \
-             '[{"_template":true,"_type":"InternalJoin","name":"","addr":"","port":0,"vlan":4000}]'
+             '[{"_template":true,"_type":"InputStreaming","name":"","addr":"","port":0,"vlan":4000}]'
   nofile_test
 end_file
 

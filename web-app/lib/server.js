@@ -18,10 +18,10 @@ var webui = require("../routes/webui");
 var monitor = require("../routes/monitor");
 var mcaststat = require("../routes/mcaststat");
 var properties = require("../routes/properties");
-var internaljoin = require("../routes/internaljoin");
+var inputstreaming = require("../routes/inputstreaming");
 var loadConfig = require("../models/config");
 var loadProperties = require("../models/properties");
-var loadInternalJoin = require("../models/internaljoin");
+var loadInputStreaming = require("../models/inputstreaming");
 var Q = require("q");
 var express = require("express");
 var app = express();
@@ -42,9 +42,9 @@ function publishProperties (props) {
     });
 }
 
-function publishInternalJoin (ij) {
+function publishInputStreaming (is) {
     return Q.fcall(function () {
-        app.internaljoin = ij;
+        app.inputstreaming = is;
         return app;
     });
 }
@@ -56,7 +56,7 @@ function addRoutes () {
 	app.use("/monitor", monitor);
 	app.use("/mcaststat", mcaststat);
 	app.use("/properties", properties);
-	app.use("/internaljoin", internaljoin);
+	app.use("/inputstreaming", inputstreaming);
         return app;
     });
 }
@@ -65,8 +65,8 @@ loadConfig(process.argv[2])
     .then(publishConfig)
     .then(loadProperties)
     .then(publishProperties)
-    .then(loadInternalJoin)
-    .then(publishInternalJoin)
+    .then(loadInputStreaming)
+    .then(publishInputStreaming)
     .then(addRoutes)
     .then(function () {
 	var server = app.listen(app.config.listenPort, app.config.listenAddress, function () {
