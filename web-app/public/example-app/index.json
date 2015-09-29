@@ -108,7 +108,7 @@
         {"name": "edit_title",  "label": "",    "defaultValue": "Edit AdminTile"}
       ],
       "models": [
-        {"id": "1", "unique_id": "1", "name": "Custom properties", "description": "Manage user-defined properties of the application module.", "location": "custom_properties"},
+        {"id": "1", "unique_id": "1", "name": "Custom properties", "description": "Manage user-defined properties of the application module.", "location": "open_custom_properties"},
         {"id": "2", "unique_id": "2", "name": "Custom UI", "description": "Open stand-alone custom web UI.", "location": "open_custom_webui"}
       ]
     }

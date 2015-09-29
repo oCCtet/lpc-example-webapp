@@ -90,12 +90,6 @@
   module_configuration, after_module_configuration and advanced_module_configuration;
   the advanced section is within an expander, which is initially closed.
   -->
-  <before_module_configuration>
-    <external_ui_access model-meta='ExternalLink' model-id='any'>
-      <navigate-action href-attr='ext_url' text='OPEN EXAMPLE UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=ExternalUI,width=1024,height=788,x=10,y=10' />
-    </external_ui_access>
-  </before_module_configuration>
-
   <module_configuration>
     <block><!-- increase block level -->
       <block icon='Network' heading='Input streaming'>
@@ -129,33 +123,16 @@
     </block>
   </module_configuration>
 
-  <after_module_configuration>
-    <list widths='25,25,25,25' type='property-table'>
-      <row>
-        <col><text>Before configuration</text></col>
-        <col><text style="BOLD">Setting with some value</text></col>
-        <col><text>Before configuration</text></col>
-        <col><text style="BOLD">Setting with some value</text></col>
-      </row>
-    </list>
-  </after_module_configuration>
-
   <advanced_module_configuration>
-    <list type='property-table'><row><col><text>Advanced</text></col></row></list>
+    <external_ui_access model-meta='ExternalLink' model-id='any'>
+      <navigate-action href-attr='ext_url' text='OPEN CUSTOM UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=ExternalUI,width=1024,height=788,x=10,y=10' />
+    </external_ui_access>
   </advanced_module_configuration>
 
   <!--
   Administration tiles support two locations: before_admin_tiles and
   after_admin_tiles, the latter demonstrated below.
   -->
-  <before_admin_tiles model-meta='AdminTile' model-multiple='true'>
-    <edit-action id='admin_tile' location-attr='location' options="{'tab-id': 'to_be_opened'}">
-      <heading attr="name" />
-      <text attr="description" />
-      <icon attr="icon" />
-    </edit-action>
-  </before_admin_tiles>
-
   <after_admin_tiles model-meta='AdminTile' model-multiple='true'>
     <edit-action id='admin_tile' location-attr='location' options="{'tab-id': 'to_be_opened'}">
       <heading attr="name" />
@@ -165,42 +142,42 @@
   </after_admin_tiles>
 
   <popup-container>
-    <user_defined_properties>
-      <block icon='Document2' heading='Custom properties'>
-        <custom_properties model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
-          <search-row></search-row>
-          <model-row>
-            <col><field attr="property_name" readonly="true" /></col>
-            <col><field attr="property_value" readonly="true" /></col>
-            <col>
-              <edit-action>
-                <edit apply='true' icon='Configure' heading='Edit property'>
-                  <include url='/example-app/edit-custom-property.xml' />
-                </edit>
-              </edit-action>
-            </col>
-            <col>
-              <delete-action>
-                <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
-                  <confirm>
-                    <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
-                  </confirm>
-                </delete>
-              </delete-action>
-            </col>
-          </model-row>
-        </custom_properties>
-        <add-action text='Add property'>
-          <edit model-meta='CustomProperty' model-create='true' icon='Configure' heading='Add property'>
-            <include url='/example-app/edit-custom-property.xml' />
-          </edit>
-        </add-action>
-      </block>
-    </user_defined_properties>
+    <open_custom_properties icon='Document2' heading=' Custom properties' model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
+      <search-row></search-row>
+        <model-row>
+          <col><field attr="property_name" readonly="true" /></col>
+          <col><field attr="property_value" readonly="true" /></col>
+          <col>
+            <edit-action>
+              <edit apply='true' icon='Configure' heading='Edit property'>
+                <include url='/example-app/edit-custom-property.xml' />
+              </edit>
+            </edit-action>
+          </col>
+          <col>
+            <delete-action>
+              <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
+                <confirm>
+                  <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
+                </confirm>
+              </delete>
+            </delete-action>
+          </col>
+        </model-row>
+      <add-action text='Add property'>
+        <edit model-meta='CustomProperty' model-create='true' icon='Configure' heading='Add property'>
+          <include url='/example-app/edit-custom-property.xml' />
+        </edit>
+      </add-action>
+    </open_custom_properties>
 
-    <open_custom_webui model-meta='ExternalLink' model-id='0'>
-      <navigate-action href-attr='ext_url' text='Custom UI (current window)' />
-      <navigate-action href-attr='ext_url' text='Custom UI (new vindow)' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,width=800,title=CustomUI,height=600,x=10,y=10' />
+    <open_custom_webui icon='Configure' heading=' Custom UI' model-meta='ExternalLink' model-id='0'>
+      <block>
+        <navigate-action href-attr='ext_url' text='Custom UI (current window)' />
+      </block>
+      <block>
+        <navigate-action href-attr='ext_url' text='Custom UI (new vindow)' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,width=800,title=CustomUI,height=600,x=10,y=10' />
+      </block>
       <container href-attr='ext_url' />
     </open_custom_webui>
   </popup-container>

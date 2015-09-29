@@ -44,7 +44,7 @@
                         if (port === "0" || port === "") {
                             port = window.location.protocol === "https:" ? "443" : "80";
                         }
-                        return API.getPath('/external_webui/index.html?host='
+                        return API.getPath('/standalone_webui/index.html?host='
                                            + window.location.hostname
                                            + '&port=' + port);
                     }
