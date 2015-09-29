@@ -24,7 +24,7 @@ router.param("id", function (req, res, next, id) {
 
 router.all(function (req, res, next) {
     if (!req.accepts("application/json"))
-	return res.status(406).send("ERROR: Must accept application/json");
+	return res.status(406).send("Must accept application/json");
     next();
 });
 

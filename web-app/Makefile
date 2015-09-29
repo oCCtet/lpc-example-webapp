@@ -1,6 +1,6 @@
 # Makefile for lpc-example-app/web-app
 
-PACKAGENAME = lpc-example-app
+PACKAGE = lpc-example-app
 LIBDIR = usr/lib/nodejs
 
 SRCDIRS = lib models routes
@@ -24,25 +24,25 @@ $(DESTDIR)/etc/init: $(wildcard initscripts/*.conf)
 	mkdir -p $@
 	install -m 0644 -t $@ $^
 
-.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)
-$(DESTDIR)/$(LIBDIR)/$(PACKAGENAME): $(wildcard *.js) $(wildcard *.json)
+.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGE)
+$(DESTDIR)/$(LIBDIR)/$(PACKAGE): $(wildcard *.js) $(wildcard *.json)
 	mkdir -p $@
 	install -m 0644 -t $@ $^
 
-.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/public
-$(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/public:
+.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/public
+$(DESTDIR)/$(LIBDIR)/$(PACKAGE)/public:
 	mkdir -p $@
 	cp -a -t $(dir $@) $(notdir $@)
 
-.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/node_modules
-$(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/node_modules: package.json
+.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/node_modules
+$(DESTDIR)/$(LIBDIR)/$(PACKAGE)/node_modules: package.json
 	mkdir -p $@
 	cp -a -t $@ $(addprefix node_modules/,\
             $(shell jq '.dependencies?|keys|join(" ")' $< | tr -d [\"]))
 
 define SRCDIR_template
-.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/$(1)
-$(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/$(1): $(wildcard $(1)/*.js) $(wildcard $(1)/*.json)
+.PHONY: $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/$(1)
+$(DESTDIR)/$(LIBDIR)/$(PACKAGE)/$(1): $(wildcard $(1)/*.js) $(wildcard $(1)/*.json)
 	mkdir -p $$@
 	install -m 0644 -t $$@ $$^
 endef
@@ -52,10 +52,10 @@ $(foreach sd,$(SRCDIRS),$(eval $(call SRCDIR_template,$(sd))))
 .PHONY: install
 install: $(DESTDIR)/etc/lpc-example-app.conf \
     $(DESTDIR)/etc/init \
-    $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME) \
-    $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/public \
-    $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/node_modules \
-    $(addprefix $(DESTDIR)/$(LIBDIR)/$(PACKAGENAME)/,$(SRCDIRS))
+    $(DESTDIR)/$(LIBDIR)/$(PACKAGE) \
+    $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/public \
+    $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/node_modules \
+    $(addprefix $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/,$(SRCDIRS))
 
 .PHONY: clean
 clean:
@@ -64,7 +64,7 @@ clean:
 distclean:
 
 DISTRIBUTE_INST_DIR=.install
-DISTRIBUTE_TARBALL=lpc-example-app.tar.gz
+DISTRIBUTE_TARBALL=$(PACKAGE).tar.gz
 DISTRIBUTE_LOGIN?=root
 DISTRIBUTE_HOST?=myluminato-ip-address
 .PHONY: distribute

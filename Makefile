@@ -1,6 +1,6 @@
 # Makefile for lpc-example-app
 
-PACKAGENAME = lpc-example-app
+PACKAGE = lpc-example-app
 SUBDIRS = web-app
 
 .DEFAULT: all

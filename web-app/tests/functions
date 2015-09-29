@@ -26,7 +26,9 @@ spawn_app()
 	spawn_result=$!
 	echo "done (pid $spawn_result)"
     else
+	spawn_result=0
 	echo "FAILED (no jobs spawned)"
+	exit 2
     fi
 }
 
@@ -246,7 +248,13 @@ jsonp_test()
 init_file()
 {
     [ -n "$1" ] || { echo "FATAL: Missing file name."; exit 2; }
-    [ -f "$1" ] && mv "$1" "${1}.test-bak"
+    [ -f "$1" ] && rm -f "$1"
+}
+
+flush_file()
+{
+    [ -n "$filename" ] || { echo "FATAL: Missing file name."; exit 2; }
+    [ -f "$filename" ] && rm -f "$filename"
 }
 
 start_file()
@@ -275,7 +283,7 @@ verify_f()
 
 end_file()
 {
-    [ -f "${filename}.test-bak" ] && mv "${filename}.test-bak" "$filename"
+    [ -f "${filename}" ] && rm -f "${filename}"
     filename=""
 }
 

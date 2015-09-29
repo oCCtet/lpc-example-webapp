@@ -60,7 +60,7 @@
                         return url;
                     }
                 },
-                ExtendedProperty: {
+                CustomProperty: {
                     getPersistentAccessibility: function () {
                         return this.get('persistent') === true
                             ? API.ATTRIBUTE_ACCESSIBILITY_STATUS.DISABLED
