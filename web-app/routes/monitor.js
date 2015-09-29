@@ -41,13 +41,13 @@ function getOsInfo () {
 
 function getOsStats () {
     var defer = Q.defer();
-    var result = [{
+    var result = {
 	id: 0,
 	totalmem: os.totalmem(),
 	freemem: os.freemem(),
 	loadavg: os.loadavg(),
 	temperatures: [ 0.0, 0.0 ]
-    }];
+    };
     var options = {
 	hostname: app.config.lpcApiAddress.addr,
 	port: app.config.lpcApiAddress.port,
@@ -57,9 +57,11 @@ function getOsStats () {
 
     httpRequest(options, function (err, res) {
 	if (err) {
-	    defer.resolve(result);
+	    defer.resolve([ result ]);
 	} else {
-	    defer.resolve(_.merge(result[0], { temperatures: _.pluck(res, "value") }));
+	    defer.resolve([
+		_.merge(result, { temperatures: _.pluck(res, "value") })
+	    ]);
 	}
     });
 
