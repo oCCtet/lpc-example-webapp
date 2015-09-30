@@ -4,6 +4,7 @@ PACKAGE = lpc-example-app
 LIBDIR = usr/lib/nodejs
 
 SRCDIRS = lib models routes
+EXTRAFILES = README.md
 
 .DEFAULT: all
 all:
@@ -47,7 +48,13 @@ $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/$(1): $(wildcard $(1)/*.js) $(wildcard $(1)/*.js
 	install -m 0644 -t $$@ $$^
 endef
 
+define EXTRAFILE_template
+$(DESTDIR)/$(LIBDIR)/$(PACKAGE)/$(1): $(1)
+	install -m 0644 $$^ $$@
+endef
+
 $(foreach sd,$(SRCDIRS),$(eval $(call SRCDIR_template,$(sd))))
+$(foreach ef,$(EXTRAFILES),$(eval $(call EXTRAFILE_template,$(ef))))
 
 .PHONY: install
 install: $(DESTDIR)/etc/lpc-example-app.conf \
@@ -55,7 +62,8 @@ install: $(DESTDIR)/etc/lpc-example-app.conf \
     $(DESTDIR)/$(LIBDIR)/$(PACKAGE) \
     $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/public \
     $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/node_modules \
-    $(addprefix $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/,$(SRCDIRS))
+    $(addprefix $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/,$(SRCDIRS)) \
+    $(addprefix $(DESTDIR)/$(LIBDIR)/$(PACKAGE)/,$(EXTRAFILES))
 
 .PHONY: clean
 clean:
