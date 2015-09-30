@@ -46,7 +46,8 @@
                         }
                         return API.getPath('/standalone_webui/index.html?host='
                                            + window.location.hostname
-                                           + '&port=' + port);
+                                           + '&port=' + port
+                                           + '&uri=' + '/' + window.location.pathname.match(/\/(.*)\/.*/)[1] + '/' + API.getPath('/'));
                     }
                 },
                 InputStreaming: {

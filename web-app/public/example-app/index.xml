@@ -125,7 +125,7 @@
 
   <advanced_module_configuration>
     <external_ui_access model-meta='ExternalLink' model-id='any'>
-      <navigate-action href-attr='ext_url' text='OPEN CUSTOM UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=ExternalUI,width=1024,height=788,x=10,y=10' />
+      <navigate-action href-attr='ext_url' text='OPEN CUSTOM UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=CustomUI,width=800,height=600,x=10,y=10' />
     </external_ui_access>
   </advanced_module_configuration>
 
@@ -144,39 +144,38 @@
   <popup-container>
     <open_custom_properties icon='Document2' heading=' Custom properties' model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
       <search-row></search-row>
-        <model-row>
-          <col><field attr="property_name" readonly="true" /></col>
-          <col><field attr="property_value" readonly="true" /></col>
-          <col>
-            <edit-action>
-              <edit apply='true' icon='Configure' heading='Edit property'>
-                <include url='/example-app/edit-custom-property.xml' />
-              </edit>
-            </edit-action>
-          </col>
-          <col>
-            <delete-action>
-              <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
-                <confirm>
-                  <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
-                </confirm>
-              </delete>
-            </delete-action>
-          </col>
-        </model-row>
+      <model-row>
+        <col><field attr="property_name" readonly="true" /></col>
+        <col><field attr="property_value" readonly="true" /></col>
+        <col>
+          <edit-action>
+            <edit apply='true' icon='Configure' heading='Edit property'>
+              <include url='/example-app/edit-custom-property.xml' />
+            </edit>
+          </edit-action>
+        </col>
+        <col>
+          <delete-action>
+            <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
+              <confirm>
+                <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
+              </confirm>
+            </delete>
+          </delete-action>
+        </col>
+      </model-row>
       <add-action text='Add property'>
         <edit model-meta='CustomProperty' model-create='true' icon='Configure' heading='Add property'>
           <include url='/example-app/edit-custom-property.xml' />
         </edit>
       </add-action>
     </open_custom_properties>
-
     <open_custom_webui icon='Configure' heading=' Custom UI' model-meta='ExternalLink' model-id='0'>
       <block>
         <navigate-action href-attr='ext_url' text='Custom UI (current window)' />
       </block>
       <block>
-        <navigate-action href-attr='ext_url' text='Custom UI (new vindow)' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,width=800,title=CustomUI,height=600,x=10,y=10' />
+        <navigate-action href-attr='ext_url' text='Custom UI (new vindow)' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=CustomUI,width=800,height=600,x=10,y=10' />
       </block>
       <container href-attr='ext_url' />
     </open_custom_webui>
