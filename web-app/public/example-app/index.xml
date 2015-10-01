@@ -123,10 +123,10 @@
     </block>
   </module_configuration>
 
-  <advanced_module_configuration>
-    <external_ui_access model-meta='ExternalLink' model-id='any'>
+  <advanced_module_configuration model-meta='ExternalLink' model-id='any'>
+    <list type='property-table' widths='100%'><row><col><block><!-- alignment and spacing hotfix -->
       <navigate-action href-attr='ext_url' text='OPEN CUSTOM UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=CustomUI,width=800,height=600,x=10,y=10' />
-    </external_ui_access>
+    </block></col></row></list>
   </advanced_module_configuration>
 
   <!--
@@ -142,28 +142,30 @@
   </after_admin_tiles>
 
   <popup-container>
-    <open_custom_properties icon='Document2' heading=' Custom properties' model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
-      <search-row></search-row>
-      <model-row>
-        <col><field attr="property_name" readonly="true" /></col>
-        <col><field attr="property_value" readonly="true" /></col>
-        <col>
-          <edit-action>
-            <edit apply='true' icon='Configure' heading='Edit property'>
-              <include url='/example-app/edit-custom-property.xml' />
-            </edit>
-          </edit-action>
-        </col>
-        <col>
-          <delete-action>
-            <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
-              <confirm>
-                <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
-              </confirm>
-            </delete>
-          </delete-action>
-        </col>
-      </model-row>
+    <open_custom_properties icon='Document2' heading=' Custom properties'>
+      <custom_properties_list model-meta='CustomProperty' model-multiple='true' widths='50%,50%,icon,icon'>
+        <search-row i18n='true'></search-row>
+        <model-row>
+          <col><field attr="property_name" readonly="true" /></col>
+          <col><field attr="property_value" readonly="true" /></col>
+          <col>
+            <edit-action>
+              <edit apply='true' icon='Configure' heading='Edit property'>
+                <include url='/example-app/edit-custom-property.xml' />
+              </edit>
+            </edit-action>
+          </col>
+          <col>
+            <delete-action>
+              <delete buttons='delete-cancel' icon='Confirm' heading='Delete property?'>
+                <confirm>
+                  <text>Do you want to delete property "</text><field readonly='true' attr='property_name' /><text>"?</text>
+                </confirm>
+              </delete>
+            </delete-action>
+          </col>
+        </model-row>
+      </custom_properties_list>
       <add-action text='Add property'>
         <edit model-meta='CustomProperty' model-create='true' icon='Configure' heading='Add property'>
           <include url='/example-app/edit-custom-property.xml' />

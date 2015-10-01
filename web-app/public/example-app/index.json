@@ -98,14 +98,12 @@
     },
     {
       "id": "AdminTile",
-      "url": "N/A",
-      "canDrag": true,
+      "local": true,
       "attributes": [
         {"name": "name",        "rw": "rw", "label": "Name"},
         {"name": "description", "rw": "rw", "label": "Description"},
         {"name": "location",    "rw": "rw", "label": "Link"},
-        {"name": "icon",        "type": "ICON", "defaultValue": "LOG_SETTINGS"},
-        {"name": "edit_title",  "label": "",    "defaultValue": "Edit AdminTile"}
+        {"name": "icon",        "type": "ICON", "defaultValue": "LOG_SETTINGS"}
       ],
       "models": [
         {"id": "1", "unique_id": "1", "name": "Custom properties", "description": "Manage user-defined properties of the application module.", "location": "open_custom_properties"},
