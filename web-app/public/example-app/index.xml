@@ -7,6 +7,15 @@
   -->
 
   <!--
+  This file defines how the application's user interface is to be incorporated into
+  the Luminato's management console (WebUI); a number of pre-defined locations are
+  available. If a location is not used, it can be omitted entirely from this file.
+    Application-specific meta models shall be defined in file index.json, and any
+  JavaScript required by the models in file <ctor>.jsonp (<ctor> being defined in
+  the index.json file).
+  -->
+
+  <!--
   Module monitoring opens by clicking the module face plate on the Monitor page;
   it supports tabbed view, illustrated below: the first tab shows basic OS stats,
   while the second tab shows example app statistics.
@@ -89,6 +98,8 @@
   module on the Service page. Four locations are available: before_module_configuration,
   module_configuration, after_module_configuration and advanced_module_configuration;
   the advanced section is within an expander, which is initially closed.
+    The example below adds input stream configurations into the module_configuration
+  location, allowing the user to manage a list of multicast groups to be received.
   -->
   <module_configuration>
     <block><!-- increase block level -->
@@ -123,15 +134,27 @@
     </block>
   </module_configuration>
 
+  <!--
+  The example below adds a button into the advanced_module_configuration location; clicking
+  it opens a browser window which is navigated into the ext_url location. The actual url is
+  defined by the getUrl() JavaScript method of the ExternalLink meta model.
+  -->
   <advanced_module_configuration model-meta='ExternalLink' model-id='any'>
-    <list type='property-table' widths='100%'><row><col><block><!-- alignment and spacing hotfix -->
+    <list type='property-table' widths='100%'><row><col><block><!-- fixup alignment and spacing -->
       <navigate-action href-attr='ext_url' text='OPEN CUSTOM UI' external='toolbar=no,scrollbars=no,menubar=no,status=no,directories=no,title=CustomUI,width=800,height=600,x=10,y=10' />
     </block></col></row></list>
   </advanced_module_configuration>
 
   <!--
-  Administration tiles support two locations: before_admin_tiles and
-  after_admin_tiles, the latter demonstrated below.
+  Administration tiles support two locations: before_admin_tiles and after_admin_tiles, the
+  latter demonstrated below. The example AdminTile meta model defines two tiles that open the
+  open_custom_properties and open_custom_webui popup windows, respectively.
+    The open_custom_properties opens a dialog enabling the user to manage a list of custom
+  properties - key-value pairs - demonstrating a simple mechanism of providing configuration
+  options for the application(s) running on the module.
+    The open_custom_webui opens a dialog providing access to the same ExternalLink model used
+  in the advanced_module_configuration, demonstrating more ways for accessing a stand-alone web
+  user interface from within the Luminato management console.
   -->
   <after_admin_tiles model-meta='AdminTile' model-multiple='true'>
     <edit-action id='admin_tile' location-attr='location' options="{'tab-id': 'to_be_opened'}">
