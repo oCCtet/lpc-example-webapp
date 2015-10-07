@@ -47,7 +47,7 @@ query_test "/monitor (os)" \
 
 query_test "/monitor (stats)" \
            '/monitor' \
-           'jq -c ".stats?|keys"' \
+           'jq -c ".stats?|.[0]|keys"' \
            '["freemem","id","loadavg","temperatures","totalmem"]'
 
 query_test "/monitor (cpu)" \
@@ -57,7 +57,7 @@ query_test "/monitor (cpu)" \
 
 query_test "/monitor/stats (temperatures)" \
            '/monitor/stats' \
-           'jq -c ".temperatures"' \
+           'jq -c ".[0]|.temperatures"' \
            '[37.4,62.1]'
 
 json_test  "/mcaststat" \

@@ -210,7 +210,7 @@ json_test()
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: JSON $msg ... "
 
-    diff -q <(curl -s http://${hostname}:${port}${url} | jq .) <(cat $path | jq .)
+    diff -u <(curl -s http://${hostname}:${port}${url} | jq .) <(cat $path | jq .)
     result=$?
 
     if [ $result -eq 0 ]; then
@@ -232,7 +232,7 @@ jsonp_test()
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: JSONP $msg ... "
 
-    diff -q <(curl -s http://${hostname}:${port}${url}) \
+    diff -u <(curl -s http://${hostname}:${port}${url}) \
             <(echo -n "/**/ typeof $fun === 'function' && ${fun}(" \
               && cat $path && echo -n ");")
     result=$?
@@ -270,7 +270,7 @@ verify_f()
     test_nbr=$((test_nbr + 1))
     echo -n "${test_nbr}: verify ($filename) ... "
 
-    diff -q <(echo -n "$1") <(cat "$filename")
+    diff -u <(echo -n "$1") <(cat "$filename")
     result=$?
 
     if [ $result -eq 0 ]; then
@@ -295,7 +295,7 @@ nofile_test()
     echo -n "${test_nbr}: nofile ($filename) ... "
 
     if [ -f "$filename" ]; then
-	diff -q <(cat "$filename") <(echo -n "[]")
+	diff -u <(cat "$filename") <(echo -n "[]")
 	result=$?
     fi
 
