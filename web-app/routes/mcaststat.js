@@ -13,12 +13,9 @@
 var fs = require("fs");
 var Q = require("q");
 var express = require("express");
-var parser = require("body-parser");
 var router = express.Router();
 
 var filename = "mcastrecv.stat";
-
-router.use(parser.json());
 
 router.all(function (req, res, next) {
     if (!req.accepts("application/json"))

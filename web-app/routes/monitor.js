@@ -15,10 +15,7 @@ var os = require("os");
 var _ = require("lodash");
 var Q = require("q");
 var express = require("express");
-var parser = require("body-parser");
 var router = express.Router();
-
-router.use(parser.json());
 
 router.all(function (req, res, next) {
     if (!req.accepts("application/json"))
