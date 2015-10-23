@@ -15,7 +15,6 @@ module.exports = function (configPath) {
 	listenPort: 8079,
 	listenAddress: "",  // bind all interfaces
 	persistentConfigDir: "/usr/etc/",
-        runtimeVariableDir: "/var/run/",
 	lpcApiAddress: { addr: "127.0.0.1", port: 8080 }
     };
 

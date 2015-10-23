@@ -1,21 +1,23 @@
 // Routes for multicast receiver statistics.
 //
-// An external receiver/monitor program is expected to update the
-// statFile with properly formatted JSON content; this route simply
-// responds with that content.
+// An external multicast receiver/monitor program at 'mcrecv:6700' is
+// expected to provide statictics via /mcast/stats HTTP API, responding
+// a properly formatted JSON content; this route simply responds with
+// that content.
+//
+// The address for host 'mcrecv' should be configured in the /etc/hosts
+// file for the example to work; the configuration may be done via Docker,
+// or even statically to be the localhost (127.0.0.1) if the service shall
+// reside on the same host.
 //
 // Copyright (C) 2015 Teleste Corporation
 
-/* globals app: false */
-
 "use strict";
 
-var fs = require("fs");
+var httpRequest = require("../lib/httprequest");
 var Q = require("q");
 var express = require("express");
 var router = express.Router();
-
-var filename = "mcastrecv.stat";
 
 router.all(function (req, res, next) {
     if (!req.accepts("application/json"))
@@ -25,13 +27,18 @@ router.all(function (req, res, next) {
 
 function readStatistics () {
     var defer = Q.defer();
-    var statFile = app.config.runtimeVariableDir + filename;
+    var options = {
+	hostname: "mcrecv",
+	port: 6700,
+	path: "/mcast/stats",
+	method: "GET"
+    };
 
-    fs.readFile(statFile, { encoding: "utf8" }, function (err, data) {
+    httpRequest(options, function (err, res) {
 	if (err) {
 	    defer.reject(new Error("Failed to read multicast receive statictics: " + err.message));
 	} else {
-	    defer.resolve(JSON.parse(data));
+	    defer.resolve(res);
 	}
     });
 

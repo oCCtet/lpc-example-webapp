@@ -60,10 +60,6 @@ query_test "/monitor/stats (temperatures)" \
            'jq -c ".[0]|.temperatures"' \
            '[37.4,62.1]'
 
-json_test  "/mcaststat" \
-           '/mcaststat' \
-           'tests/mcastrecv.stat'
-
 ensure_no_errors
 
 start_file tests/custom-properties.conf
