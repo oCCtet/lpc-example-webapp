@@ -1,4 +1,4 @@
-// Custop web app bootstrap.
+// Custom webapp bootstrap.
 //
 // Copyright (C) 2015 Teleste Corporation
 
