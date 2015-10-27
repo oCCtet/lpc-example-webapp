@@ -27,17 +27,6 @@
             };
 
             NS.model = {
-                McastReceiverStat: {
-                    getUrl: function () {
-                        var url;
-                        var addr = this.get('addr');
-                        var port = this.get('port');
-                        if (addr && port) {
-                            url = 'udp://' + addr + ':' + port;
-                        }
-                        return url;
-                    }
-                },
                 ExternalLink: {
                     getUrl: function () {
                         var port = window.location.port;

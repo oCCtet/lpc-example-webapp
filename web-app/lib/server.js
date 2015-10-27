@@ -16,7 +16,6 @@
 
 var webui = require("../routes/webui");
 var monitor = require("../routes/monitor");
-var mcaststat = require("../routes/mcaststat");
 var properties = require("../routes/properties");
 var inputstreaming = require("../routes/inputstreaming");
 var loadConfig = require("../models/config");
@@ -54,7 +53,6 @@ function addRoutes () {
 	app.use(express.static(__dirname + "/../public"));
 	app.use("/example-app", webui);
 	app.use("/monitor", monitor);
-	app.use("/mcaststat", mcaststat);
 	app.use("/properties", properties);
 	app.use("/inputstreaming", inputstreaming);
         return app;

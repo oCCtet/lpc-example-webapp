@@ -18,7 +18,7 @@
   <!--
   Module monitoring opens by clicking the module face plate on the Monitor page;
   it supports tabbed view, illustrated below: the first tab shows basic OS stats,
-  while the second tab shows example app statistics.
+  while the second tab shows CPU stats.
   -->
   <module_monitoring>
     <edit icon='Monitor' heading=' Application module monitoring'>
@@ -56,6 +56,10 @@
               </model-row>
             </os_stats>
           </col></row>
+        </list>
+      </tab>
+      <tab heading='CPU information'>
+        <list widths='100%'>
           <row><col>
             <cpu_info model-meta='CpuInfo' model-multiple='true' refreshable='true' widths='100%,140px'>
               <header-row>
@@ -67,26 +71,6 @@
                 <col><field readonly="true" attr="speed" /></col>
               </model-row>
             </cpu_info>
-          </col></row>
-        </list>
-      </tab>
-      <tab heading='Multicast receiving'>
-        <list widths='100%'>
-          <row><col>
-            <mcast_recv_stat model-meta='McastReceiverStat' model-multiple='true' refreshable='true' widths='140px,140px,200px,100%'>
-              <header-row>
-                <col><text attr="url" /></col>
-                <col><text attr="recvTime" /></col>
-                <col><text attr="recvBytes" /></col>
-                <col><text attr="recvPackets" /></col>
-              </header-row>
-              <model-row>
-                <col><field readonly="true" attr="url" /></col>
-                <col><field readonly="true" attr="recvTime" /></col>
-                <col><field readonly="true" attr="recvBytes" /></col>
-                <col><field readonly="true" attr="recvPackets" /></col>
-              </model-row>
-            </mcast_recv_stat>
           </col></row>
         </list>
       </tab>
