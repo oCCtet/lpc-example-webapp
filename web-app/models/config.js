@@ -13,7 +13,7 @@ module.exports = function (configPath) {
     var path = configPath || "/etc/lpc-example-app.conf";
     var conf = {
 	listenPort: 8079,
-	listenAddress: "",  // bind all interfaces
+	listenAddress: "127.0.0.1",
 	persistentConfigDir: "/usr/etc/",
 	lpcApiAddress: { addr: "127.0.0.1", port: 8080 }
     };
