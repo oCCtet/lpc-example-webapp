@@ -1,11 +1,11 @@
 LPC webapp for UI integration
 =============================
 
-This example webapp for the Application module demonstrates the
+This example webapp for the application module demonstrates the
 integration of application-specific user interface elements into
 the management console (a.k.a. WebUI).
 
-# Overview #
+## Overview ##
 
 The management console provides several pre-defined locations onto
 which applications may inject their custom user interface elements.
@@ -15,27 +15,27 @@ the applications may choose to just offer a method to access their
 stand-alone web user interface e.g. in the form of a button that opens
 the stand-alone interface into another web browser window.
 
-The example webapp is built with [n][Node.js], serving the HTTP requests
+The example webapp is built with [Node.js][n], serving the HTTP requests
 made by the management console to:
 
-  1. Load the static UI integration (layout, model and JavaScript) files, and
-  2. Serve the RESTful requests made by the UI integration itself.
+  - Load the static UI integration (layout, model and JavaScript) files, and
+  - Serve the RESTful requests made by the UI integration itself.
 
   [n]: https://nodejs.org
 
 The webapp exposes TCP port 8079.
 
-# Containerization #
+## Containerization ##
 
 The webapp for integrating user interface should reside in its own
 container, as should other parts of the application. To enable access
-to Application module resources, the containers may need to be run in
+to application module resources, the containers may need to be run in
 the _host_ network mode.
 
 Slot-specific configuration should be stored in a host-mounted data
 volume, as in `-v /usr/etc/appconfig:/usr/etc`.
 
-# Native Installation #
+## Native Installation ##
 
 The example webapp can alternatively be installed and run "natively"
 on the host; either by copying the source as-is to the host, or by
@@ -56,7 +56,7 @@ Run the following command to install:
 Upstart script is also installed to auto-start the application on system
 boot.
 
-# License #
+## License ##
 
 The webapp is Copyright (C) 2015 Teleste Corporation.
 
