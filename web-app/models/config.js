@@ -15,7 +15,7 @@ module.exports = function (configPath) {
 	listenPort: 8079,
 	listenAddress: "127.0.0.1",
 	persistentConfigDir: "/usr/etc/",
-	lpcApiAddress: { addr: "127.0.0.1", port: 8080 }
+	lpcApiAddress: { addr: "127.0.0.1", port: 8085 }
     };
 
     fs.readFile(path, { encoding: "utf8" }, function (err, data) {
