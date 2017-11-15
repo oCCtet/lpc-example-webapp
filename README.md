@@ -58,7 +58,7 @@ boot.
 
 ## License ##
 
-The webapp is Copyright (C) 2015-2016 Teleste Corporation.
+The webapp is Copyright (C) 2015-2017 Teleste Corporation.
 
 The webapp is provided as-is, solely for the purpose of being example
 source code, not meant for production.

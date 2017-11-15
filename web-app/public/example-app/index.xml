@@ -100,7 +100,7 @@
             </edit-action>
           </col>
           <col>
-            <delete-action text='Delete input'>
+            <delete-action title='Delete input'>
               <delete buttons='delete-cancel' icon='Confirm' heading='Delete streaming input?'>
                 <confirm>
                   <text>Do you want to delete input "</text><field readonly='true' attr='name' /><text>"?</text>
